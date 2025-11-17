@@ -1,0 +1,506 @@
+openapi: 3.0.3
+info:
+  title: Juta Berlian API
+  version: 1.0.0
+  description: API documentation for Jutaberlian system.
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /login:
+    post:
+      summary: User login
+      description: Authenticate a user and return a JWT token for subsequent authorized requests.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Successful authentication response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /inventory/shared-items:
+    get:
+      summary: Get all shared items
+      description: Retrieve a list of all shared items in inventory.
+      tags:
+        - Inventory - Shared Items
+      responses:
+        "200":
+          description: Successful response with list of shared items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SharedItem"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    post:
+      summary: Create a new shared item
+      description: Add a new shared item to the inventory.
+      tags:
+        - Inventory - Shared Items
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/postSharedItemSchema"
+      responses:
+        "201":
+          description: Shared item created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 3
+        "400":
+          $ref: "#/components/responses/InvariantErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /inventory/shared-items/{id}:
+    get:
+      summary: Get a shared item by ID
+      description: Retrieve details of a specific shared item by its ID, including its borrow list.
+      tags:
+        - Inventory - Shared Items
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the shared item to retrieve
+      responses:
+        "200":
+          description: Successful response with shared item details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: "#/components/schemas/SharedItem"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    put:
+      summary: Update an existing shared item
+      description: Update name and description of an existing shared item by ID.
+      tags:
+        - Inventory - Shared Items
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the shared item to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateSharedItemSchema"
+      responses:
+        "200":
+          description: Shared item updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Shared item updated successfully
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    delete:
+      summary: Delete a shared item
+      description: Remove a shared item from the inventory by ID.
+      tags:
+        - Inventory - Shared Items
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the shared item to delete
+      responses:
+        "200":
+          description: Shared item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Shared item deleted successfully
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /inventory/borrow-lists:
+    get:
+      summary: Get all borrow lists
+      description: Retrieve a list of all borrow lists from inventory.
+      tags:
+        - Inventory - Borrow Lists
+      responses:
+        "200":
+          description: Successful response with list of borrow lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BorrowList"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    post:
+      summary: Create a new borrow list
+      description: Add a new borrow record for a shared item.
+      tags:
+        - Inventory - Borrow Lists
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/postBorrowListSchema"
+      responses:
+        "201":
+          description: Borrow list created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /inventory/borrow-lists/{id}:
+    delete:
+      summary: Delete a borrow list
+      description: Delete a borrow list record by ID.
+      tags:
+        - Inventory - Borrow Lists
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the borrow list to delete
+      responses:
+        "200":
+          description: Borrow list deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Borrow list deleted successfully
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: password123
+
+    SharedItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Printer A3"
+        description:
+          type: string
+          example: "High-resolution color printer"
+        borrow_lists:
+          type: array
+          items:
+            $ref: "#/components/schemas/BorrowList"
+
+    postSharedItemSchema:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: "Projector"
+        description:
+          type: string
+          example: "HD projector with HDMI support"
+
+    updateSharedItemSchema:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: "Updated Projector"
+        description:
+          type: string
+          example: "Updated description for projector"
+
+    BorrowList:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        shared_item_id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: "John Doe"
+        borrow_start_date:
+          type: string
+          format: date
+          example: "2025-11-01"
+        borrow_end_date:
+          type: string
+          format: date
+          example: "2025-11-05"
+
+    postBorrowListSchema:
+      type: object
+      required:
+        - shared_item_id
+        - name
+        - borrow_start_date
+        - borrow_end_date
+      properties:
+        shared_item_id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: "Jane Doe"
+        borrow_start_date:
+          type: string
+          format: date
+          example: "2025-11-01"
+        borrow_end_date:
+          type: string
+          format: date
+          example: "2025-11-03"
+
+  responses:
+    InvariantErrorResponse:
+      description: Validation failed due to invalid input
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              data:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+            example:
+              status: fail
+              data:
+                name:
+                  - "Field must not be empty"
+
+    ValidationErrorResponse:
+      description: Validation error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              data:
+                type: object
+                additionalProperties:
+                  type: string
+            example:
+              status: fail
+              data:
+                shared_item_id: "This field is required"
+
+    NotFoundErrorResponse:
+      description: Not found error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: "Data not found"
+
+    ServerErrorResponse:
+      description: Server error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              error:
+                type: string
+                example: "Internal server error"
+
+    AuthenticationErrorResponse:
+      description: Authentication error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              message:
+                type: string
+            example:
+              status: fail
+              message: "Authentication failed"
