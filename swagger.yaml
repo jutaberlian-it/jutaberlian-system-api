@@ -9,7 +9,7 @@ servers:
     description: Local development server
 
 paths:
-  /login:
+  /auth/login:
     post:
       summary: User login
       description: Authenticate a user and return a JWT token for subsequent authorized requests.

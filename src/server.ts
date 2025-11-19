@@ -15,6 +15,8 @@ import User from "./models/User";
 import SharedItemBorrowListServices from "./services/SharedItemBorrowListServices";
 import SharedItemBorrowList from "./models/SharedItemBorrowList";
 import sharedItemBorrowListRoute from "./routes/sharedItemBorrowListRoute";
+import session, { Cookie } from "express-session";
+import passport from "passport";
 
 const app = express();
 const sharedItemServices = new SharedItemServices(SharedItem);
@@ -22,20 +24,33 @@ const authServices = new AuthServices(User);
 const borrowListServices = new SharedItemBorrowListServices(
   SharedItemBorrowList
 );
+var sess = {
+  secret: "keyboard cat",
+  cookie: {} as Cookie,
+};
 
-app.use(express.json());
+// Set express session cookie to secure for production only
+if (app.get("env") === "production") {
+  app.set("trust proxy", 1); // trust first proxy
+  sess.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sess));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(
   cors({
     credentials: true,
     origin: "http://localhost:3000",
   })
 );
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.use("/api/v1", swaggerRoute);
-app.use("/api/v1", authRoute(authServices));
+app.use("/api/v1/auth", authRoute(authServices));
 app.use("/api/v1", sharedItemRoute(sharedItemServices));
 app.use("/api/v1", sharedItemBorrowListRoute(borrowListServices));
 

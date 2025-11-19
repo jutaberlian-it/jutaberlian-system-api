@@ -1,5 +1,4 @@
-import { FindOptions, IncludeOptions, ModelStatic, Options } from "sequelize";
-import ClientError from "../exceptions/ClientError";
+import { FindOptions, IncludeOptions, ModelStatic } from "sequelize";
 import NotFoundError from "../exceptions/NotFound";
 import SharedItem from "../models/SharedItem";
 

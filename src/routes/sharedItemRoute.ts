@@ -3,7 +3,7 @@ import SharedItemServices from "../services/SharedItemServices";
 import SharedItemController from "../controllers/SharedItemController";
 import validate from "../middlewares/validate";
 import { postSharedItemSchema } from "../validator/sharedItemValidator";
-import authenticate from "../middlewares/passport";
+import { authenticateJwt } from "../middlewares/passport";
 
 const router = express.Router();
 
@@ -14,18 +14,18 @@ export default (service: SharedItemServices) => {
   router.get("/inventory/shared-items/:id", controller.getSharedItemById);
   router.post(
     "/inventory/shared-items",
-    authenticate,
+    authenticateJwt,
     validate(postSharedItemSchema),
     controller.postSharedItem
   );
   router.put(
     "/inventory/shared-items/:id",
-    authenticate,
+    authenticateJwt,
     controller.updateSharedItem
   );
   router.delete(
     "/inventory/shared-items/:id",
-    authenticate,
+    authenticateJwt,
     controller.deleteSharedItem
   );
 

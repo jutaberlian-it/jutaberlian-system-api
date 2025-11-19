@@ -1,16 +1,19 @@
 import express from "express";
 import validate from "../middlewares/validate";
-import authenticate from "../middlewares/passport";
 import SharedItemBorrowListServices from "../services/SharedItemBorrowListServices";
 import SharedItemBorrowListController from "../controllers/SharedItemBorrowListController";
 import { postBorrrowListSchema } from "../validator/borrowListValidator";
+import { authenticateJwt } from "../middlewares/passport";
+import { ensureLoggedIn } from "connect-ensure-login";
+
+const ensureIsLoggedIn = ensureLoggedIn("/login");
 
 const router = express.Router();
 
 export default (service: SharedItemBorrowListServices) => {
   const controller = new SharedItemBorrowListController(service);
 
-  router.get("/inventory/borrow-lists", controller.getLists);
+  router.get("/inventory/borrow-lists", ensureIsLoggedIn, controller.getLists);
   router.post(
     "/inventory/borrow-lists",
     validate(postBorrrowListSchema),
@@ -18,7 +21,7 @@ export default (service: SharedItemBorrowListServices) => {
   );
   router.delete(
     "/inventory/borrow-lists/:id",
-    authenticate,
+    authenticateJwt,
     controller.deleteList
   );
 

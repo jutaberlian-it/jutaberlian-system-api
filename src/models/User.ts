@@ -10,7 +10,9 @@ import sequelize from "../config/sequelize";
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
   declare username: string;
-  declare password: string;
+  declare password: CreationOptional<string>;
+  declare email: CreationOptional<string>;
+  declare googleId: CreationOptional<string>;
 }
 
 User.init(
@@ -26,7 +28,15 @@ User.init(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

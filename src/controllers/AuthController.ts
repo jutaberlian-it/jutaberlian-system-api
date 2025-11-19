@@ -21,4 +21,13 @@ export default class AuthController {
 
     res.status(200).json({ success: true, data: { token } });
   };
+
+  getUserSession = async (req: Request, res: Response, next: NextFunction) => {
+    return res.json({
+      success: true,
+      data: {
+        user: req.user,
+      },
+    });
+  };
 }

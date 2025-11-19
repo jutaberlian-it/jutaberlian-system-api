@@ -8,5 +8,9 @@ declare global {
     export interface Request {
       user?: User;
     }
+
+    export interface User {
+      id: number;
+    }
   }
 }
