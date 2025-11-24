@@ -1,7 +1,8 @@
-import { IncludeOptions, ModelStatic, Op } from "sequelize";
+import { FindOptions, ModelStatic, Op, WhereOptions } from "sequelize";
 import SharedItemBorrowList from "../models/SharedItemBorrowList";
 import NotFoundError from "../exceptions/NotFound";
 import ClientError from "../exceptions/ClientError";
+import SharedItem from "../models/SharedItem";
 
 export default class SharedItemBorrowListServices {
   private model;
@@ -10,12 +11,105 @@ export default class SharedItemBorrowListServices {
     this.model = model;
   }
 
-  getLists = async ({ options }: { options?: IncludeOptions } = {}) => {
+  getLists = async ({
+    page = 1,
+    limit = 10,
+    q,
+    returned = false,
+    options,
+  }: {
+    page: number;
+    limit: number;
+    q?: string;
+    returned?: boolean;
+    options?: FindOptions;
+  }) => {
     try {
-      return this.model.findAll({
-        attributes: { exclude: ["created_at", "updated_at"] },
+      const where: WhereOptions = {};
+
+      if (returned) {
+        where.return_photo_url = {
+          [Op.not]: null,
+        };
+      } else {
+        where.return_photo_url = {
+          [Op.is]: null,
+        };
+      }
+
+      if (q && q !== "") {
+        where.name = {
+          [Op.iLike]: `%${q}%`,
+        };
+      }
+
+      return this.model.findAndCountAll({
         ...options,
+        attributes: { exclude: ["created_at", "updated_at"] },
+        offset: (page - 1) * limit,
+        limit: limit,
+        where,
       });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getUserLists = async ({
+    page = 1,
+    limit = 10,
+    user_id,
+    q,
+    options,
+  }: {
+    page: number;
+    limit: number;
+    user_id: number;
+    q?: string;
+    options?: FindOptions;
+  }) => {
+    try {
+      const where: WhereOptions = {};
+
+      if (q && q !== "") {
+        where.name = {
+          [Op.iLike]: `%${q}%`,
+        };
+      }
+
+      return this.model.findAndCountAll({
+        ...options,
+        attributes: { exclude: ["created_at", "updated_at"] },
+        offset: (page - 1) * limit,
+        limit: limit,
+        where: {
+          return_photo_url: {
+            [Op.is]: null,
+          },
+          user_id,
+        },
+        include: {
+          model: SharedItem,
+          as: "item",
+          where,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getListById = async (id: number) => {
+    try {
+      const list = await this.model.findByPk(id, {
+        attributes: { exclude: ["created_at", "updated_at"] },
+      });
+
+      if (!list) {
+        throw new NotFoundError("Shared item borrow list not found");
+      }
+
+      return list;
     } catch (error) {
       throw error;
     }
@@ -37,6 +131,7 @@ export default class SharedItemBorrowListServices {
     name: string;
     borrow_start_date: Date;
     borrow_end_date: Date;
+    user_id: number;
   }) => {
     try {
       const borrowList = await this.model.findOne({
@@ -63,6 +158,23 @@ export default class SharedItemBorrowListServices {
 
       const newList = await this.model.create(data);
       return newList.id;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  editList = async (id: number, photo: Express.Multer.File) => {
+    try {
+      const list = await this.model.findByPk(id);
+
+      if (!list) {
+        throw new NotFoundError("Shared item borrow list not found");
+      }
+
+      await list.update({
+        return_photo_url:
+          process.env.API_HOST + "/api/v1/images/" + photo.filename,
+      });
     } catch (error) {
       throw error;
     }

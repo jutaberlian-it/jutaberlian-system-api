@@ -1,7 +1,6 @@
 import z from "zod";
 
 export const postBorrrowListSchema = z.object({
-  name: z.string().min(1, "Name is required"),
   borrow_start_date: z.coerce
     .date()
     .min(new Date(), "Start date must be in the future"),

@@ -10,7 +10,7 @@ export default class SharedItemServices {
   }
 
   getSharedItems = async ({ options }: { options?: IncludeOptions } = {}) => {
-    return this.model.findAll({
+    return this.model.findAndCountAll({
       attributes: { exclude: ["created_at", "updated_at"] },
       ...options,
     });

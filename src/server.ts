@@ -17,6 +17,7 @@ import SharedItemBorrowList from "./models/SharedItemBorrowList";
 import sharedItemBorrowListRoute from "./routes/sharedItemBorrowListRoute";
 import session, { Cookie } from "express-session";
 import passport from "passport";
+import path from "path";
 
 const app = express();
 const sharedItemServices = new SharedItemServices(SharedItem);
@@ -46,6 +47,10 @@ app.use(
 );
 app.use(express.json());
 
+app.use(
+  "/api/v1/images",
+  express.static(path.resolve(__dirname, "..", "uploads"))
+);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
