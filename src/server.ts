@@ -42,7 +42,7 @@ app.use(passport.session());
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://103.146.202.144:3000"],
   })
 );
 app.use(express.json());
