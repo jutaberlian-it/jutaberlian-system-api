@@ -12,7 +12,15 @@ export default class SharedItemController {
   getSharedItems = async (req: Request, res: Response) => {
     try {
       const sharedItems = await this.sharedItemServices.getSharedItems();
-      res.status(200).json({ status: "success", data: sharedItems });
+      res
+        .status(200)
+        .json({
+          status: "success",
+          data: {
+            records: sharedItems.rows,
+            metadata: { total_records: sharedItems.count },
+          },
+        });
     } catch (error) {
       throw error;
     }

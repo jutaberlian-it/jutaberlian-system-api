@@ -1,6 +1,7 @@
 import sequelize from "../config/sequelize";
 import SharedItem from "../models/SharedItem";
 import SharedItemBorrowList from "../models/SharedItemBorrowList";
+import User from "../models/User";
 
 const associateModels = () => {
   SharedItem.hasMany(SharedItemBorrowList, {
@@ -10,6 +11,13 @@ const associateModels = () => {
   SharedItemBorrowList.belongsTo(SharedItem, {
     foreignKey: "shared_item_id",
     as: "item",
+  });
+
+  User.hasMany(SharedItemBorrowList, {
+    foreignKey: "user_id",
+  });
+  SharedItemBorrowList.belongsTo(User, {
+    foreignKey: "user_id",
   });
 };
 

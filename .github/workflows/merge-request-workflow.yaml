@@ -1,0 +1,92 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.vars.outputs.sha_short }}
+    env:
+      BUILD_ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'dev' && 'staging' }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Get short commit hash
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sentosa-travel-api:${{ steps.vars.outputs.sha_short }}
+          file: ./Dockerfile
+          build-args: |
+            BUILD_ENVIRONMENT=${{ env.BUILD_ENVIRONMENT }}
+
+  deploy-image:
+    needs: build-push-image
+    runs-on: ubuntu-latest
+    env:
+      BUILD_ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'dev' && 'staging' }}
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Log in to Docker Hub using the access token
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            cd /home/jutaberlian/jutaberlian-api
+            pwd
+            source .env
+
+            # Set the image tag value in .env file depending on the environment
+            if [ "${{ env.BUILD_ENVIRONMENT }}" == "production" ]; then
+              sed -i "s/^PRODUCTION_APP_IMAGE_TAG=[^ ]*/PRODUCTION_APP_IMAGE_TAG=${{ needs.build-push-image.outputs.sha_short }}/" .env
+              container_name="$PRODUCTION_CONTAINER_NAME"
+            elif [ "${{ env.BUILD_ENVIRONMENT }}" == "staging" ]; then
+              sed -i "s/^STAGING_APP_IMAGE_TAG=[^ ]*/STAGING_APP_IMAGE_TAG=${{ needs.build-push-image.outputs.sha_short }}/" .env
+              container_name="$STAGING_CONTAINER_NAME"
+            fi
+
+            # Stop running container
+            if [ "$(docker ps -f name=$container_name -q)" ]; then
+              docker stop $container_name
+            fi
+
+            # Get the image of the stopped container
+            old_image=$(docker ps -a -f name=$container_name --format "{{.Image}}")
+
+            # Remove stopped container
+            if [ "$(docker ps -a -f name=$container_name -q)" ]; then
+              docker rm $container_name
+            fi
+
+            # Remove old image if it exists
+            if [ -n "$old_image" ]; then
+              docker rmi $old_image
+            fi
+
+            # Pull new image & run container
+            docker-compose up ${{ env.BUILD_ENVIRONMENT }}_api --build -d
+
+            # Logout docker
+            docker logout

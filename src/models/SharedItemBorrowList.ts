@@ -16,6 +16,8 @@ class SharedItemBorrowList extends Model<
   declare shared_item_id: number;
   declare borrow_start_date: Date;
   declare borrow_end_date: Date;
+  declare return_photo_url: CreationOptional<string | null>;
+  declare user_id: number;
 }
 
 SharedItemBorrowList.init(
@@ -44,6 +46,19 @@ SharedItemBorrowList.init(
     borrow_end_date: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    return_photo_url: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+      allowNull: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
     },
   },
   {

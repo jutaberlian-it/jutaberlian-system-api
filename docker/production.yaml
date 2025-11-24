@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  production_api:
+    image: ${APP_IMAGE_NAME}:${PRODUCTION_APP_IMAGE_TAG}
+    container_name: ${PRODUCTION_CONTAINER_NAME}
+    restart: unless-stopped
+    ports:
+      - ${PRODUCTION_APP_PORT}:8000
+    volumes:
+      - ./uploads:/app/uploads
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - prod-app-network
+  staging_api:
+    image: ${APP_IMAGE_NAME}:${STAGING_APP_IMAGE_TAG}
+    container_name: ${STAGING_CONTAINER_NAME}
+    restart: unless-stopped
+    ports:
+      - ${STAGING_APP_PORT}:8000
+    volumes:
+      - ./uploads-staging:/app/uploads
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=staging
+    networks:
+      - dev-app-network
+
+networks:
+  prod-app-network:
+    external: true
+  dev-app-network:
+    external: true

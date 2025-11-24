@@ -51,6 +51,21 @@ paths:
       description: Retrieve a list of all shared items in inventory.
       tags:
         - Inventory - Shared Items
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination (starts from 1)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Number of records per page
       responses:
         "200":
           description: Successful response with list of shared items
@@ -221,6 +236,115 @@ paths:
       description: Retrieve a list of all borrow lists from inventory.
       tags:
         - Inventory - Borrow Lists
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination (starts from 1)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Number of records per page
+        - in: query
+          name: q
+          schema:
+            type: string
+            default: ""
+          description: query
+        - in: query
+          name: returned
+          schema:
+            type: boolean
+            default: false
+          description: Status
+      responses:
+        "200":
+          description: Successful response with list of borrow lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BorrowList"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    post:
+      summary: Create a new borrow list
+      description: Add a new borrow record for a shared item.
+      tags:
+        - Inventory - Borrow Lists
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/postBorrowListSchema"
+      responses:
+        "201":
+          description: Borrow list created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /inventory/borrow-lists/me:
+    get:
+      summary: Get all user's borrow lists
+      description: Retrieve a list of all user's borrow lists from inventory.
+      tags:
+        - Inventory - Borrow Lists
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination (starts from 1)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Number of records per page
+        - in: query
+          name: q
+          schema:
+            type: string
+            default: ""
+          description: query
       responses:
         "200":
           description: Successful response with list of borrow lists
@@ -277,6 +401,59 @@ paths:
           $ref: "#/components/responses/ServerErrorResponse"
 
   /inventory/borrow-lists/{id}:
+    put:
+      summary: Update borrow list return photo
+      description: Upload or update the return photo for a borrow list record by ID.
+      tags:
+        - Inventory - Borrow Lists
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the borrow list to update
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - photo
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: Return photo file to upload
+      responses:
+        "201":
+          description: Return photo uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
     delete:
       summary: Delete a borrow list
       description: Delete a borrow list record by ID.
@@ -345,10 +522,6 @@ components:
         description:
           type: string
           example: "High-resolution color printer"
-        borrow_lists:
-          type: array
-          items:
-            $ref: "#/components/schemas/BorrowList"
 
     postSharedItemSchema:
       type: object
@@ -396,6 +569,8 @@ components:
           type: string
           format: date
           example: "2025-11-05"
+        item:
+          $ref: "#/components/schemas/SharedItem"
 
     postBorrowListSchema:
       type: object
