@@ -51,7 +51,7 @@ app.use(
   "/api/v1/images",
   express.static(path.resolve(__dirname, "..", "uploads"))
 );
-app.get("/", (req, res) => {
+app.get("/api/v1", (req, res) => {
   res.send("Hello World!");
 });
 app.use("/api/v1", swaggerRoute);

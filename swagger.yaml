@@ -363,43 +363,6 @@ paths:
         "500":
           $ref: "#/components/responses/ServerErrorResponse"
 
-    post:
-      summary: Create a new borrow list
-      description: Add a new borrow record for a shared item.
-      tags:
-        - Inventory - Borrow Lists
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/postBorrowListSchema"
-      responses:
-        "201":
-          description: Borrow list created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 10
-        "400":
-          $ref: "#/components/responses/ValidationErrorResponse"
-        "401":
-          $ref: "#/components/responses/AuthenticationErrorResponse"
-        "500":
-          $ref: "#/components/responses/ServerErrorResponse"
-
   /inventory/borrow-lists/{id}:
     put:
       summary: Update borrow list return photo
