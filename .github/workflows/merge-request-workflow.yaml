@@ -54,7 +54,7 @@ jobs:
             # Log in to Docker Hub using the access token
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-            cd /home/jutaberlian/jutaberlian-api
+            cd /root/jutaberlian/jutaberlian-api
             pwd
             source .env
 
