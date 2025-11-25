@@ -86,7 +86,7 @@ jobs:
             fi
 
             # Pull new image & run container
-            docker-compose up ${{ env.BUILD_ENVIRONMENT }}_api --build -d
+            docker-compose up --build -d ${{ env.BUILD_ENVIRONMENT }}_api
 
             # Logout docker
             docker logout
