@@ -3,7 +3,6 @@ import SharedItemBorrowList from "../models/SharedItemBorrowList";
 import NotFoundError from "../exceptions/NotFound";
 import ClientError from "../exceptions/ClientError";
 import SharedItem from "../models/SharedItem";
-import { API_HOST } from "../constant";
 
 export default class SharedItemBorrowListServices {
   private model;
@@ -173,7 +172,8 @@ export default class SharedItemBorrowListServices {
       }
 
       await list.update({
-        return_photo_url: API_HOST + "/api/v1/images/" + photo.filename,
+        return_photo_url:
+          process.env.API_HOST + "/api/v1/images/" + photo.filename,
       });
     } catch (error) {
       throw error;
