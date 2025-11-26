@@ -32,7 +32,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sentosa-travel-api:${{ steps.vars.outputs.sha_short }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/jutaberlian-api:${{ steps.vars.outputs.sha_short }}
           file: ./Dockerfile
           build-args: |
             BUILD_ENVIRONMENT=${{ env.BUILD_ENVIRONMENT }}
@@ -54,7 +54,7 @@ jobs:
             # Log in to Docker Hub using the access token
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-            cd /home/jutaberlian/jutaberlian-api
+            cd /root/jutaberlian/jutaberlian-api
             pwd
             source .env
 
@@ -86,7 +86,7 @@ jobs:
             fi
 
             # Pull new image & run container
-            docker-compose up ${{ env.BUILD_ENVIRONMENT }}_api --build -d
+            docker-compose up --build -d ${{ env.BUILD_ENVIRONMENT }}_api
 
             # Logout docker
             docker logout

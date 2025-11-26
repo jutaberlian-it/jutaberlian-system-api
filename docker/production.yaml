@@ -10,7 +10,7 @@ services:
     volumes:
       - ./uploads:/app/uploads
     env_file:
-      - .env
+      - .env.production
     environment:
       - NODE_ENV=production
     networks:
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./uploads-staging:/app/uploads
     env_file:
-      - .env
+      - .env.staging
     environment:
       - NODE_ENV=staging
     networks:

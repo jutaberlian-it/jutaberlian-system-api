@@ -42,7 +42,11 @@ app.use(passport.session());
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:3000", "http://103.146.202.144:3000"],
+    origin: [
+      "http://localhost:3000",
+      "http://jutaberlian.id:3001",
+      "https://jutaberlian.id",
+    ],
   })
 );
 app.use(express.json());
@@ -51,7 +55,7 @@ app.use(
   "/api/v1/images",
   express.static(path.resolve(__dirname, "..", "uploads"))
 );
-app.get("/", (req, res) => {
+app.get("/api/v1", (req, res) => {
   res.send("Hello World!");
 });
 app.use("/api/v1", swaggerRoute);
