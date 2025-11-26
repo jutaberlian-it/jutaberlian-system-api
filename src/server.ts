@@ -44,8 +44,8 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3000",
-      "http://103.146.202.144:3000",
-      "http://103.146.202.144:3001",
+      "http://jutaberlian.id:3001",
+      "https://jutaberlian.id",
     ],
   })
 );
