@@ -1,0 +1,39 @@
+version: "3.8"
+
+volumes:
+  n8n_storage:
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=production_db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=jutaberlian
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=mismag0203i9
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - N8N_RUNNERS_ENABLED=true
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+    ports:
+      - 5678:5678
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    networks:
+      - prod-app-network
+
+networks:
+  prod-app-network:
+    name: prod-app-network
+    external: true
+  dev-app-network:
+    name: dev-app-network
+    external: true

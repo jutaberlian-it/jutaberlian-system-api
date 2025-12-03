@@ -1,6 +1,10 @@
 import sequelize from "../config/sequelize";
+import Customer from "../models/Customer";
+import Reservation from "../models/Reservation";
+import ReservationTable from "../models/ReservationTable";
 import SharedItem from "../models/SharedItem";
 import SharedItemBorrowList from "../models/SharedItemBorrowList";
+import Table from "../models/Table";
 import User from "../models/User";
 
 const associateModels = () => {
@@ -18,6 +22,20 @@ const associateModels = () => {
   });
   SharedItemBorrowList.belongsTo(User, {
     foreignKey: "user_id",
+  });
+
+  Customer.hasMany(Reservation, {
+    foreignKey: "customer_id",
+  });
+  Reservation.belongsTo(Customer, {
+    foreignKey: "customer_id",
+  });
+
+  Reservation.belongsToMany(Table, {
+    through: ReservationTable,
+  });
+  Table.belongsToMany(Reservation, {
+    through: ReservationTable,
   });
 };
 
