@@ -19,7 +19,11 @@ var opts: passportJwt.WithSecretOrKey = {
 passport.use(
   new JwtStrategy(opts, function (jwt_payload, done) {
     if (jwt_payload) {
-      return done(null, { id: jwt_payload.id, username: jwt_payload.username });
+      return done(null, {
+        id: jwt_payload.id,
+        username: jwt_payload.username,
+        role: jwt_payload.role,
+      });
     }
 
     return done(true, false);

@@ -6,6 +6,7 @@ import { ModelStatic } from "sequelize";
 import NotFoundError from "../exceptions/NotFound";
 import { JWT_SECRET } from "../constant";
 import { AuthenticatedUser } from "../types/AuthenticatedUser";
+import Role from "../models/Role";
 
 export default class AuthServices {
   private user;
@@ -32,7 +33,13 @@ export default class AuthServices {
 
   generateToken = async (username: string) => {
     try {
-      const user = await this.user.findOne({ where: { username } });
+      const user = await this.user.findOne({
+        where: { username },
+        include: {
+          model: Role,
+          attributes: ["title"],
+        },
+      });
 
       if (!user) {
         throw new NotFoundError("User not found");
@@ -41,6 +48,7 @@ export default class AuthServices {
       const payload = {
         id: user.id,
         username: user.username,
+        role_id: user.role?.id,
       };
       const token = jwt.sign(payload, JWT_SECRET, {
         expiresIn: "1h",

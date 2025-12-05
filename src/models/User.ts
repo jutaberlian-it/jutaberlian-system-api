@@ -4,8 +4,10 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 import sequelize from "../config/sequelize";
+import Role from "./Role";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
@@ -13,6 +15,9 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare password: CreationOptional<string>;
   declare email: CreationOptional<string>;
   declare googleId: CreationOptional<string>;
+  declare role_id: CreationOptional<number>;
+  // Inclusions
+  declare role?: NonAttribute<Role>;
 }
 
 User.init(
@@ -38,11 +43,18 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 1,
+    },
   },
   {
     sequelize,
     modelName: "User",
     underscored: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );
 

@@ -15,6 +15,7 @@ services:
       - ./database:/var/lib/postgresql
     networks:
       - prod-app-network
+
   staging_db:
     image: postgres:18
     container_name: staging_db
@@ -29,6 +30,7 @@ services:
       - ./database-staging:/var/lib/postgresql
     networks:
       - dev-app-network
+
   nginx:
     image: nginx:alpine
     container_name: nginx-proxy
@@ -40,6 +42,21 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
+    networks:
+      - prod-app-network
+
+  n8n_db:
+    image: postgres:18
+    container_name: n8n_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./database-n8n:/var/lib/postgresql
     networks:
       - prod-app-network
 

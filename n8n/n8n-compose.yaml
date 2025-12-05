@@ -9,11 +9,11 @@ services:
     restart: always
     environment:
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=production_db
-      - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=jutaberlian
-      - DB_POSTGRESDB_USER=postgres
-      - DB_POSTGRESDB_PASSWORD=mismag0203i9
+      - DB_POSTGRESDB_HOST=${PG_HOST}
+      - DB_POSTGRESDB_PORT=${PG_PORT}
+      - DB_POSTGRESDB_DATABASE=${PG_DATABASE}
+      - DB_POSTGRESDB_USER=${PG_USER}
+      - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
       - N8N_PORT=5678
@@ -33,7 +33,4 @@ services:
 networks:
   prod-app-network:
     name: prod-app-network
-    external: true
-  dev-app-network:
-    name: dev-app-network
     external: true
