@@ -74,7 +74,10 @@ export default class ReservationTableServices {
     }
   };
 
-  editReservationTable = async (id: number, data: { seats: number }) => {
+  editReservationTable = async (
+    id: number,
+    data: { seats: number; table_number: string; is_active: boolean }
+  ) => {
     try {
       const table = await this.getReservationTableById(id);
 

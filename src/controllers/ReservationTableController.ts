@@ -65,11 +65,13 @@ export default class ReservationTableController {
 
   updateReservationTable = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { seats } = req.body;
+    const { seats, table_number, is_active } = req.body;
 
     try {
       await this.reservationTableServices.editReservationTable(Number(id), {
         seats,
+        table_number,
+        is_active,
       });
 
       res.status(200).json({

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AuthenticationError from "../exceptions/AuthenticationError";
 import AuthServices from "../services/AuthServices";
-import passport from "passport";
 
 export default class AuthController {
   private service: AuthServices;

@@ -18,6 +18,7 @@ export const isReservationAdmin = (
 ) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     const user = req.user;
+
     if (user.role_id === 2) {
       // role_id 2 is Reservation Admin
       return next();
