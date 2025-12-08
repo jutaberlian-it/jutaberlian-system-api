@@ -9,14 +9,24 @@ export default class ReservationTableController {
   }
 
   getReservationTables = async (req: Request, res: Response) => {
+    const { page, limit, q } = req.query;
+
     try {
-      const tables = await this.reservationTableServices.getReservationTables();
+      const tables = await this.reservationTableServices.getReservationTables({
+        page: Number(page),
+        limit: Number(limit),
+        q: q ? String(q) : "",
+      });
 
       res.status(200).json({
         status: "success",
         data: {
           records: tables.rows,
-          metadata: { total_records: tables.count },
+          metadata: {
+            total_records: tables.count,
+            page: Number(page),
+            limit: Number(limit),
+          },
         },
       });
     } catch (error) {
@@ -39,11 +49,12 @@ export default class ReservationTableController {
   };
 
   postReservationTable = async (req: Request, res: Response) => {
-    const { seats } = req.body;
+    const { seats, table_number } = req.body;
 
     try {
       const id = await this.reservationTableServices.addReservationTable({
         seats,
+        table_number,
       });
 
       res.status(201).json({ status: "success", data: { id } });

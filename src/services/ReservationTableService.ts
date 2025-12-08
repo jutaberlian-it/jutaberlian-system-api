@@ -1,4 +1,10 @@
-import { FindOptions, ModelStatic } from "sequelize";
+import {
+  FindOptions,
+  InferAttributes,
+  ModelStatic,
+  Op,
+  WhereOptions,
+} from "sequelize";
 import NotFoundError from "../exceptions/NotFound";
 import Table from "../models/Table";
 
@@ -10,11 +16,30 @@ export default class ReservationTableServices {
   }
 
   getReservationTables = async ({
+    page = 1,
+    limit = 10,
+    q,
     options,
-  }: { options?: FindOptions } = {}) => {
+  }: {
+    page: number;
+    limit: number;
+    q?: string;
+    options?: FindOptions;
+  }) => {
+    const where: WhereOptions = {};
+
+    if (q && q !== "") {
+      where.table_number = {
+        [Op.iLike]: `%${q}%`,
+      };
+    }
+
     return this.model.findAndCountAll({
-      attributes: { exclude: ["created_at", "updated_at"] },
       ...options,
+      where,
+      attributes: { exclude: ["created_at", "updated_at"] },
+      offset: (page - 1) * limit,
+      limit: limit,
     });
   };
 
@@ -36,7 +61,10 @@ export default class ReservationTableServices {
     }
   };
 
-  addReservationTable = async (data: { seats: number }) => {
+  addReservationTable = async (data: {
+    seats: number;
+    table_number: string;
+  }) => {
     try {
       const table = await this.model.create(data);
       return table.id;

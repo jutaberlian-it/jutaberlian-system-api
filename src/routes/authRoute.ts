@@ -10,7 +10,20 @@ const router = express.Router();
 export default (service: AuthServices) => {
   const controller = new AuthController(service);
 
-  router.post("/login", controller.login);
+  router.post(
+    "/login",
+    passport.authenticate("local", {
+      failWithError: true,
+    }),
+    (req: Request, res: Response) => {
+      // if (req.xhr)
+      return res.json({ success: true, message: "Logged in" });
+    },
+    (err: Error, req: Request, res: Response) => {
+      // if (req.xhr)
+      return res.status(401).send({ success: false, message: err.message });
+    }
+  );
 
   router.get("/google", (req, res, next) => {
     let returnTo = "";

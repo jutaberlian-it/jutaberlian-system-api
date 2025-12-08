@@ -39,14 +39,15 @@ const associateModels = () => {
     through: ReservationTable,
   });
 
-  Role.hasMany(User, { foreignKey: "role_id" });
-  User.belongsTo(Role, { foreignKey: "role_id" });
+  Role.hasMany(User, { foreignKey: "role_id", as: "users" });
+  User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 };
 
 export const syncModels = async () => {
   try {
     associateModels();
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
+    // await sequelize.sync({ alter: true });
     console.log("All models were synchronized successfully.");
   } catch (error) {
     console.error("Failed to synchronize models:", error);

@@ -37,7 +37,8 @@ export default class AuthServices {
         where: { username },
         include: {
           model: Role,
-          attributes: ["title"],
+          attributes: ["id"],
+          as: "role",
         },
       });
 

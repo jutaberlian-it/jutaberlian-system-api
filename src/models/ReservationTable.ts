@@ -14,6 +14,7 @@ class ReservationTable extends Model<
   declare id: CreationOptional<number>;
   declare reservation_id: number;
   declare table_id: number;
+  declare table_number: number;
   declare created_at: CreationOptional<Date>;
   declare updated_at: CreationOptional<Date>;
 }
@@ -40,6 +41,10 @@ ReservationTable.init(
         model: "tables",
         key: "id",
       },
+    },
+    table_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,

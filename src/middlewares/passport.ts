@@ -2,18 +2,52 @@ import passportJwt from "passport-jwt";
 import passport from "passport";
 import { JWT_SECRET } from "../constant";
 import passportGoogle from "passport-google-oauth20";
+import passportLocal from "passport-local";
 import User from "../models/User";
 import { Op } from "sequelize";
+import bcrypt from "bcryptjs";
 
 var JwtStrategy = passportJwt.Strategy,
   ExtractJwt = passportJwt.ExtractJwt;
 
 var GoogleStrategy = passportGoogle.Strategy;
 
+var LocalStrategy = passportLocal.Strategy;
+
 var opts: passportJwt.WithSecretOrKey = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: JWT_SECRET,
 };
+
+passport.use(
+  new LocalStrategy(async function verify(username, password, cb) {
+    try {
+      const user = await User.findOne({
+        where: { username },
+      });
+
+      if (!user)
+        return cb(null, false, {
+          message: "Incorrect username or password.",
+        });
+
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+      if (!isPasswordValid)
+        return cb(null, false, {
+          message: "Incorrect username or password.",
+        });
+
+      return cb(null, {
+        username: user.username,
+        id: user.id,
+        role_id: user.role_id,
+      });
+    } catch (error) {
+      return cb(error);
+    }
+  })
+);
 
 // For authentication with JWT
 passport.use(
@@ -22,7 +56,7 @@ passport.use(
       return done(null, {
         id: jwt_payload.id,
         username: jwt_payload.username,
-        role: jwt_payload.role,
+        role_id: jwt_payload.role_id,
       });
     }
 
@@ -87,4 +121,4 @@ passport.deserializeUser(async (id: number, done) => {
   }
 });
 
-export const authenticateJwt = passport.authenticate("jwt", { session: false });
+export default passport;
