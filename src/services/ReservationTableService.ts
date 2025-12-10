@@ -1,10 +1,4 @@
-import {
-  FindOptions,
-  InferAttributes,
-  ModelStatic,
-  Op,
-  WhereOptions,
-} from "sequelize";
+import { FindOptions, ModelStatic, Op, WhereOptions } from "sequelize";
 import NotFoundError from "../exceptions/NotFound";
 import Table from "../models/Table";
 
@@ -19,14 +13,18 @@ export default class ReservationTableServices {
     page = 1,
     limit = 10,
     q,
+    is_active,
     options,
   }: {
     page: number;
     limit: number;
     q?: string;
+    is_active: boolean;
     options?: FindOptions;
   }) => {
-    const where: WhereOptions = {};
+    const where: WhereOptions = {
+      is_active,
+    };
 
     if (q && q !== "") {
       where.table_number = {

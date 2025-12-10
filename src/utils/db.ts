@@ -30,13 +30,16 @@ const associateModels = () => {
   });
   Reservation.belongsTo(Customer, {
     foreignKey: "customer_id",
+    as: "customer",
   });
 
   Reservation.belongsToMany(Table, {
     through: ReservationTable,
+    as: "tables",
   });
   Table.belongsToMany(Reservation, {
     through: ReservationTable,
+    as: "reservations",
   });
 
   Role.hasMany(User, { foreignKey: "role_id", as: "users" });

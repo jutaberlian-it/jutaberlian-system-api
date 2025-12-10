@@ -9,13 +9,14 @@ export default class ReservationTableController {
   }
 
   getReservationTables = async (req: Request, res: Response) => {
-    const { page, limit, q } = req.query;
+    const { page, limit, q, is_active } = req.query;
 
     try {
       const tables = await this.reservationTableServices.getReservationTables({
         page: Number(page),
         limit: Number(limit),
         q: q ? String(q) : "",
+        is_active: is_active === "true",
       });
 
       res.status(200).json({

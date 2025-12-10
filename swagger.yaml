@@ -659,6 +659,246 @@ paths:
         "500":
           $ref: "#/components/responses/ServerErrorResponse"
 
+  /reservations:
+    get:
+      summary: Get all reservations
+      description: Retrieve a paginated list of reservations with optional status and search filter.
+      tags:
+        - Reservations
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination (starts from 1)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Number of records per page
+        - in: query
+          name: q
+          schema:
+            type: string
+            default: ""
+          description: Search query (e.g. customer name or phone number)
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [PENDING, CONFIRMED, SEATED, COMPLETED, CANCELLED, NO_SHOW]
+          description: Filter reservations by status
+      responses:
+        "200":
+          description: Successful response with list of reservations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      records:
+                        type: array
+                        items:
+                          type: object
+                          description: Reservation record
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            customer_id:
+                              type: integer
+                              example: 10
+                            guest_count:
+                              type: integer
+                              example: 4
+                            status:
+                              type: string
+                              enum:
+                                [
+                                  PENDING,
+                                  CONFIRMED,
+                                  SEATED,
+                                  COMPLETED,
+                                  CANCELLED,
+                                  NO_SHOW,
+                                ]
+                              example: CONFIRMED
+                            special_occasion:
+                              type: string
+                              nullable: true
+                              example: BIRTHDAY
+                            notes:
+                              type: string
+                              nullable: true
+                              example: "Window seat request"
+                            start_datetime:
+                              type: string
+                              format: date-time
+                              example: "2025-12-10T18:00:00+08:00"
+                            end_datetime:
+                              type: string
+                              format: date-time
+                              example: "2025-12-10T20:00:00+08:00"
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                      metadata:
+                        type: object
+                        properties:
+                          total_records:
+                            type: integer
+                            example: 42
+                          page:
+                            type: integer
+                            example: 1
+                          limit:
+                            type: integer
+                            example: 10
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /reservations/{id}:
+    get:
+      summary: Get reservation by ID
+      description: Retrieve details of a specific reservation by its ID.
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the reservation to retrieve
+      responses:
+        "200":
+          description: Successful response with reservation detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      reservation:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          customer_id:
+                            type: integer
+                            example: 10
+                          guest_count:
+                            type: integer
+                            example: 4
+                          status:
+                            type: string
+                            enum:
+                              [
+                                PENDING,
+                                CONFIRMED,
+                                SEATED,
+                                COMPLETED,
+                                CANCELLED,
+                                NO_SHOW,
+                              ]
+                            example: CONFIRMED
+                          special_occasion:
+                            type: string
+                            nullable: true
+                            example: ANNIVERSARY
+                          notes:
+                            type: string
+                            nullable: true
+                            example: "Allergic to shellfish"
+                          start_datetime:
+                            type: string
+                            format: date-time
+                            example: "2025-12-10T18:00:00+08:00"
+                          end_datetime:
+                            type: string
+                            format: date-time
+                            example: "2025-12-10T20:00:00+08:00"
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+    put:
+      summary: Update reservation status
+      description: Update the status of an existing reservation by ID.
+      tags:
+        - Reservations
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the reservation to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    [PENDING, CONFIRMED, SEATED, COMPLETED, CANCELLED, NO_SHOW]
+                  example: CONFIRMED
+      responses:
+        "200":
+          description: Reservation updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Reservation updated successfully
+        "400":
+          $ref: "#/components/responses/ValidationErrorResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationErrorResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
