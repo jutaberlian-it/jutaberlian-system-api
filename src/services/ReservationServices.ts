@@ -2,6 +2,7 @@ import { FindOptions, ModelStatic, Op, WhereOptions } from "sequelize";
 import NotFoundError from "../exceptions/NotFound";
 import Reservation from "../models/Reservation";
 import Customer from "../models/Customer";
+import Table from "../models/Table";
 
 export default class ReservationServices {
   private model;
@@ -35,14 +36,22 @@ export default class ReservationServices {
       return this.model.findAndCountAll({
         ...options,
         attributes: { exclude: ["created_at", "updated_at"] },
-        include: {
-          model: Customer,
-          as: "customer",
-          attributes: {
-            exclude: ["created_at", "updated_at"],
+        include: [
+          {
+            model: Customer,
+            as: "customer",
+            attributes: {
+              exclude: ["created_at", "updated_at"],
+            },
+            where: customerWhere,
           },
-          where: customerWhere,
-        },
+          {
+            model: Table,
+            as: "tables",
+            through: { attributes: [] },
+            attributes: ["id", "table_number"],
+          },
+        ],
         where: {
           status,
         },
