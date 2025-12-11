@@ -483,6 +483,13 @@ paths:
             type: string
             default: ""
           description: query
+        - in: query
+          name: is_active
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
+          description: status
       responses:
         "200":
           description: Successful response with list of reservation tables

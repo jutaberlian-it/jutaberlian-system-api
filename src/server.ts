@@ -71,8 +71,8 @@ app.use("/api/v1", swaggerRoute);
 app.use("/api/v1/auth", authRoute(authServices));
 app.use("/api/v1", sharedItemRoute(sharedItemServices));
 app.use("/api/v1", sharedItemBorrowListRoute(borrowListServices));
-app.use("/api/v1", reservationRoutes(reservationServices));
 app.use("/api/v1", reservationTableRoutes(reservationTableServices));
+app.use("/api/v1", reservationRoutes(reservationServices));
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

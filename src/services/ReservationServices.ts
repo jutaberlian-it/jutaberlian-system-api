@@ -55,6 +55,7 @@ export default class ReservationServices {
         where: {
           status,
         },
+        order: [["start_datetime", "ASC"]],
         offset: (page - 1) * limit,
         limit: limit,
       });
