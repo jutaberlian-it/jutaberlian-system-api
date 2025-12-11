@@ -13,6 +13,7 @@ class Table extends Model<
 > {
   declare id: CreationOptional<number>;
   declare seats: number;
+  declare table_number: string;
   declare is_active: CreationOptional<boolean>;
   declare created_at: CreationOptional<Date>;
   declare updated_at: CreationOptional<Date>;
@@ -27,6 +28,10 @@ Table.init(
     },
     seats: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    table_number: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     is_active: {
