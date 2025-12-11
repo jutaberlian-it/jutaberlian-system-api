@@ -35,13 +35,16 @@ const reservationServices = new ReservationServices(Reservation);
 const reservationTableServices = new ReservationTableServices(Table);
 var sess = {
   secret: "keyboard cat",
-  cookie: {} as Cookie,
+  cookie: {
+    sameSite: "lax",
+  } as Cookie,
 };
 
 // Set express session cookie to secure for production only
 if (app.get("env") === "production") {
   app.set("trust proxy", 1); // trust first proxy
   sess.cookie.secure = true; // serve secure cookies
+  sess.cookie.sameSite = false;
 }
 
 app.use(session(sess));
