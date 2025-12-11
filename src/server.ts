@@ -18,6 +18,12 @@ import sharedItemBorrowListRoute from "./routes/sharedItemBorrowListRoute";
 import session, { Cookie } from "express-session";
 import passport from "passport";
 import path from "path";
+import reservationTableRoutes from "./routes/reservationTableRoutes";
+import ReservationTableServices from "./services/ReservationTableService";
+import Table from "./models/Table";
+import reservationRoutes from "./routes/reservationRoutes";
+import ReservationServices from "./services/ReservationServices";
+import Reservation from "./models/Reservation";
 
 const app = express();
 const sharedItemServices = new SharedItemServices(SharedItem);
@@ -25,6 +31,8 @@ const authServices = new AuthServices(User);
 const borrowListServices = new SharedItemBorrowListServices(
   SharedItemBorrowList
 );
+const reservationServices = new ReservationServices(Reservation);
+const reservationTableServices = new ReservationTableServices(Table);
 var sess = {
   secret: "keyboard cat",
   cookie: {} as Cookie,
@@ -50,6 +58,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   "/api/v1/images",
@@ -62,6 +71,8 @@ app.use("/api/v1", swaggerRoute);
 app.use("/api/v1/auth", authRoute(authServices));
 app.use("/api/v1", sharedItemRoute(sharedItemServices));
 app.use("/api/v1", sharedItemBorrowListRoute(borrowListServices));
+app.use("/api/v1", reservationTableRoutes(reservationTableServices));
+app.use("/api/v1", reservationRoutes(reservationServices));
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

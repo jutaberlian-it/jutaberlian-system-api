@@ -1,6 +1,11 @@
 import sequelize from "../config/sequelize";
+import Customer from "../models/Customer";
+import Reservation from "../models/Reservation";
+import ReservationTable from "../models/ReservationTable";
+import Role from "../models/Role";
 import SharedItem from "../models/SharedItem";
 import SharedItemBorrowList from "../models/SharedItemBorrowList";
+import Table from "../models/Table";
 import User from "../models/User";
 
 const associateModels = () => {
@@ -19,11 +24,32 @@ const associateModels = () => {
   SharedItemBorrowList.belongsTo(User, {
     foreignKey: "user_id",
   });
+
+  Customer.hasMany(Reservation, {
+    foreignKey: "customer_id",
+  });
+  Reservation.belongsTo(Customer, {
+    foreignKey: "customer_id",
+    as: "customer",
+  });
+
+  Reservation.belongsToMany(Table, {
+    through: ReservationTable,
+    as: "tables",
+  });
+  Table.belongsToMany(Reservation, {
+    through: ReservationTable,
+    as: "reservations",
+  });
+
+  Role.hasMany(User, { foreignKey: "role_id", as: "users" });
+  User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 };
 
 export const syncModels = async () => {
   try {
     associateModels();
+    // await sequelize.sync();
     await sequelize.sync({ alter: true });
     console.log("All models were synchronized successfully.");
   } catch (error) {
