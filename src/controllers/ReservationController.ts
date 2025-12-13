@@ -9,7 +9,7 @@ export default class ReservationController {
   }
 
   getReservations = async (req: Request, res: Response) => {
-    const { page, limit, q, status } = req.query;
+    const { page, limit, q, status, start_date, end_date } = req.query;
 
     try {
       const reservations = await this.reservationServices.getReservations({
@@ -17,6 +17,8 @@ export default class ReservationController {
         limit: Number(limit),
         q: q ? String(q) : "",
         status: String(status),
+        start_date: new Date(String(start_date)),
+        end_date: new Date(String(end_date)),
       });
 
       res.status(200).json({
@@ -61,6 +63,24 @@ export default class ReservationController {
       res.status(200).json({
         status: "success",
         message: "Reservation updated successfully",
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getReservationDashboardData = async (req: Request, res: Response) => {
+    const { start_date, end_date } = req.query;
+
+    try {
+      const data = await this.reservationServices.getReservationDashboardData({
+        start_date: new Date(String(start_date)),
+        end_date: new Date(String(end_date)),
+      });
+
+      res.status(200).json({
+        status: "success",
+        data,
       });
     } catch (error) {
       throw error;

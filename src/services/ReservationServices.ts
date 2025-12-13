@@ -17,12 +17,16 @@ export default class ReservationServices {
     q,
     status = "CONFIRMED",
     options,
+    start_date,
+    end_date,
   }: {
     page: number;
     limit: number;
     q?: string;
     status: string;
     options?: FindOptions;
+    start_date: Date;
+    end_date: Date;
   }) => {
     try {
       const customerWhere: WhereOptions = {};
@@ -54,6 +58,9 @@ export default class ReservationServices {
         ],
         where: {
           status,
+          start_datetime: {
+            [Op.between]: [start_date, end_date],
+          },
         },
         order: [["start_datetime", "ASC"]],
         offset: (page - 1) * limit,
@@ -100,6 +107,27 @@ export default class ReservationServices {
       await reservation.update(data);
     } catch (error) {
       console.error("Error updating table:", error);
+      throw error;
+    }
+  };
+
+  getReservationDashboardData = async ({
+    start_date,
+    end_date,
+  }: {
+    start_date: Date;
+    end_date: Date;
+  }) => {
+    try {
+      return await this.model.count({
+        where: {
+          start_datetime: {
+            [Op.between]: [start_date, end_date],
+          },
+        },
+        group: ["status"],
+      });
+    } catch (error) {
       throw error;
     }
   };

@@ -11,6 +11,11 @@ export default (service: ReservationServices) => {
   const controller = new ReservationController(service);
 
   router.get("/reservations", controller.getReservations);
+  router.get(
+    "/reservations/dashboard",
+    isReservationAdmin,
+    controller.getReservationDashboardData
+  );
   router.get("/reservations/:id", controller.getReservationById);
   router.put(
     "/reservations/:id",

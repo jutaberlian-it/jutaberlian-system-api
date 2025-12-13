@@ -675,6 +675,7 @@ paths:
       parameters:
         - in: query
           name: page
+          required: true
           schema:
             type: integer
             minimum: 1
@@ -682,6 +683,7 @@ paths:
           description: Page number for pagination (starts from 1)
         - in: query
           name: limit
+          required: true
           schema:
             type: integer
             minimum: 1
@@ -695,10 +697,26 @@ paths:
           description: Search query (e.g. customer name or phone number)
         - in: query
           name: status
+          required: true
           schema:
             type: string
             enum: [PENDING, CONFIRMED, SEATED, COMPLETED, CANCELLED, NO_SHOW]
+            default: "CONFIRMED"
           description: Filter reservations by status
+        - in: query
+          name: start_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 00:00:00"
+        - in: query
+          name: end_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 23:59:59"
       responses:
         "200":
           description: Successful response with list of reservations
@@ -774,6 +792,46 @@ paths:
                           limit:
                             type: integer
                             example: 10
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
+  /reservations/dashboard:
+    get:
+      summary: Get reservation dahsboard data
+      tags:
+        - Reservations
+      parameters:
+        - in: query
+          name: start_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 00:00:00"
+        - in: query
+          name: end_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 23:59:59"
+      responses:
+        "200":
+          description: Successful response with list of reservations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      CONFIRMED:
+                        type: integer
+                        example: 1
         "500":
           $ref: "#/components/responses/ServerErrorResponse"
 
