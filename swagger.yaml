@@ -795,6 +795,46 @@ paths:
         "500":
           $ref: "#/components/responses/ServerErrorResponse"
 
+  /reservations/dashboard:
+    get:
+      summary: Get reservation dahsboard data
+      tags:
+        - Reservations
+      parameters:
+        - in: query
+          name: start_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 00:00:00"
+        - in: query
+          name: end_date
+          required: true
+          schema:
+            type: string
+            format: datetime
+            example: "2023-12-03 23:59:59"
+      responses:
+        "200":
+          description: Successful response with list of reservations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      CONFIRMED:
+                        type: integer
+                        example: 1
+        "500":
+          $ref: "#/components/responses/ServerErrorResponse"
+
   /reservations/{id}:
     get:
       summary: Get reservation by ID

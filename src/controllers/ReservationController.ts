@@ -68,4 +68,22 @@ export default class ReservationController {
       throw error;
     }
   };
+
+  getReservationDashboardData = async (req: Request, res: Response) => {
+    const { start_date, end_date } = req.query;
+
+    try {
+      const data = await this.reservationServices.getReservationDashboardData({
+        start_date: new Date(String(start_date)),
+        end_date: new Date(String(end_date)),
+      });
+
+      res.status(200).json({
+        status: "success",
+        data,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
 }

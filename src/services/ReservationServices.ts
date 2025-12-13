@@ -110,4 +110,25 @@ export default class ReservationServices {
       throw error;
     }
   };
+
+  getReservationDashboardData = async ({
+    start_date,
+    end_date,
+  }: {
+    start_date: Date;
+    end_date: Date;
+  }) => {
+    try {
+      return await this.model.count({
+        where: {
+          start_datetime: {
+            [Op.between]: [start_date, end_date],
+          },
+        },
+        group: ["status"],
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
 }

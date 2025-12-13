@@ -55,7 +55,7 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3000",
-      "http://jutaberlian.id:3001",
+      "https://staging.jutaberlian.id",
       "https://jutaberlian.id",
     ],
   })

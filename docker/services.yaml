@@ -44,6 +44,7 @@ services:
       - /var/www/certbot:/var/www/certbot:ro
     networks:
       - prod-app-network
+      - dev-app-network
 
   n8n_db:
     image: postgres:18
