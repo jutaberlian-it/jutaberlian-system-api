@@ -2,6 +2,7 @@ import sequelize from "../config/sequelize";
 import Customer from "../models/Customer";
 import Reservation from "../models/Reservation";
 import ReservationTable from "../models/ReservationTable";
+import ResReminder from "../models/ResReminder";
 import Role from "../models/Role";
 import SharedItem from "../models/SharedItem";
 import SharedItemBorrowList from "../models/SharedItemBorrowList";
@@ -42,8 +43,27 @@ const associateModels = () => {
     as: "reservations",
   });
 
-  Role.hasMany(User, { foreignKey: "role_id", as: "users" });
-  User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
+  Role.hasMany(User, {
+    foreignKey: "role_id",
+    as: "users",
+  });
+  User.belongsTo(Role, {
+    foreignKey: {
+      name: "role_id",
+      allowNull: false,
+      defaultValue: 1,
+    },
+    as: "role",
+  });
+
+  Reservation.hasOne(ResReminder, {
+    foreignKey: "reservation_id",
+    as: "reminder",
+  });
+  ResReminder.belongsTo(Reservation, {
+    foreignKey: "reservation_id",
+    as: "reservation",
+  });
 };
 
 export const syncModels = async () => {

@@ -37,6 +37,7 @@ var sess = {
   secret: "keyboard cat",
   cookie: {
     sameSite: "lax",
+    maxAge: 12 * 60 * 60 * 1000, // 12 hours
   } as Cookie,
 };
 
